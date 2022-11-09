@@ -1,0 +1,92 @@
+---
+    title: "Untitled"
+author: "Vinaketch"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+vinaketch <- readRDS("my_day2matrix.rds")
+vinaketch
+
+```
+
+###add rowsums and means
+
+```{r}
+rowSums(vinaketch)
+rowMeans(vinaketch)
+vinaketch_2 <- cbind(vinaketch, 
+                     rowSums = rowSums(vinaketch), 
+                     rowMeans = rowMeans(vinaketch))
+vinaketch_2
+
+```
+
+###loading toothGrowth Dataset
+
+```{r}
+data("ToothGrowth")
+summary(ToothGrowth)
+head(ToothGrowth)
+```
+### mean tooth length
+
+```{r}
+mean(ToothGrowth$len)
+max(ToothGrowth$len)
+min(ToothGrowth$len)
+```
+###rowsums and rowmeans
+
+```{r}
+#This doesn't work 
+rowSums(ToothGrowth)
+rowMeans(ToothGrowth)
+```
+###Creating a functiopn to calculate hypotenus
+
+```{r}
+hypotenuse <- function(side1, side2) {
+  hypo <- sqrt(side1^2 + side2^2)
+  return(hypo)
+}
+hypotenuse(3,4)
+```
+###laaply and lapply assigmnent
+
+```{r}
+van <- c(10:20)
+
+square <- function(y){
+  sq=y^2
+  return(sq)
+}
+
+square(5)
+
+###lapply
+lapply(van, square)
+
+sapply(van, square)
+
+```
+##using apply on both numberic and logical vectors
+
+```{r}
+my_list <- list(van, vinaketch, seq(from = 10, to =18, by =2 ), c(T,T,F,F))
+lapply(my_list, sum)
+sapply(my_list, sum)
+
+
+```
+###repeat each element using repeat
+
+```{r}
+sapply(my_list, rep, each = 3)
+```
+
