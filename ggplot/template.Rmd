@@ -47,24 +47,45 @@ ggplot(diamonds, aes(x = carat, y = price))
 - Add data points showing `carat` on the x-axis and `price` on the y-axis.
 
 ```{r}
-ggplot(diamonds, aes(x = carat, y = price))
-  
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point(color='blue')
 ```
 
 - Color data points by `cut`.
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
-
+ggplot(diamonds, aes(x = carat, y = price, color=cut)) +
+  geom_point()
   
 ```
 
-- Add a smoothed mean trend line.
+- Add a smoothed mean trend line to all the plots.
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
+###Plot1
+plot1<-ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point() +
+  geom_smooth()
 
+###Plot2
+plot2<-ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point(aes(colour = cut)) +
+  geom_smooth()
 
+###plot4
+plot4<-ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_smooth(aes(colour = cut))
+
+```
+
+###plot3
+
+```{r}
+plot3<-ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point() +
+  geom_smooth(aes(colour = cut))
 
 ```
 
@@ -72,7 +93,8 @@ ggplot(diamonds, aes(x = carat, y = price))
 
 ```{r}
 
-
+obds_diamonds <- ggplot(diamonds, aes(x = carat, y = price, color=cut)) +
+  geom_point() + geom_smooth() 
 
 ```
 
@@ -108,15 +130,17 @@ Using the `ChickWeight` data set:
 - Create a scatter plot of weight (y-axis) over time (x-axis).
 
 ```{r}
-ggplot(   )
-
+ggplot(ChickWeight )
+ggplot(ChickWeight, aes(x = Time, y = weight))+
+  geom_point()
 ```
 
 - Color by diet.
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
-
+ggplot(ChickWeight, aes(x = Time, y = weight, color=Diet)) +
+  geom_point()
 
 ```
 
@@ -125,7 +149,8 @@ ggplot(   )
 
 ```{r}
 
-
+ggplot(ChickWeight, aes(x = Time, y = weight, color=Diet)) +
+  geom_point() + geom_smooth(method = lm)
 
 ```
 
@@ -138,18 +163,27 @@ the diet that leads to the highest mean increase in weight.
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
+ggplot(ChickWeight, aes(x = Time, y = weight, color=Diet)) +
+  geom_point() + geom_smooth(method = lm) +
+  facet_wrap( ~ Diet, nrow=2)
+```
+
+###Facets-Grid
 
 
-
+```{r}
+ggplot(ChickWeight, aes(x = Time, y = weight, color=Diet)) +
+  geom_point() + geom_smooth(method = lm) + 
+  facet_grid( weight ~ Chick)
 
 ```
 
 - Assign that last plot to an object called `obds_chickweight`.
 
 ```{r}
-
-
-
+obds_chickenweight <- ggplot(ChickWeight, aes(x = Time, y = weight, color=Diet)) +
+  geom_point() + geom_smooth(method = lm) + 
+  facet_wrap(~Diet, nrow = 2)
 
 ```
 
@@ -160,7 +194,7 @@ the diet that leads to the highest mean increase in weight.
 - Load the `ggplot2::msleep` data set.
 
 ```{r}
-
+ggplot2::msleep
 
 ```
 
@@ -168,7 +202,8 @@ the diet that leads to the highest mean increase in weight.
   (i.e, one plot and one bar per taxonomic order).
 
 ```{r}
-ggplot(   )
+ggplot(ggplot2::msleep, aes(x=order)) +
+  geom_bar() + facet_wrap(~order)
 
 ```
 
@@ -177,7 +212,8 @@ ggplot(   )
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
-
+ggplot(ggplot2::msleep, aes(x=order)) +
+  geom_bar() + theme(axis.text.x = element_text(angle=90))
 
 
 
@@ -189,11 +225,11 @@ ggplot(   )
 
 ```{r}
 
-
-
-
-
-
+ggplot(ggplot2::msleep, aes(x=order)) +
+  geom_bar() + theme(axis.text.x = element_text(angle=90, hjust = 1, vjust=0.5, size=rel(1.5)))+ 
+  labs(title='msleep', x='order', y='observation')+ 
+  theme(axis.title = element_text(size=18))+
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -201,12 +237,11 @@ ggplot(   )
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
-
-
-
-
-
-
+ggplot(ggplot2::msleep, aes(x=order, fill=genus)) +
+  geom_bar() + theme(axis.text.x = element_text(angle=90, hjust = 1, vjust=0.5, size=rel(1.5)))+ 
+  labs(title='msleep', x='order', y='observation')+ 
+  theme(axis.title = element_text(size=18))+
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -217,13 +252,12 @@ From this point onwards, you may need to iteratively resize the text of the tick
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
-
-
-
-
-
-
-
+ggplot(ggplot2::msleep, aes(x=order, fill=genus)) +
+  geom_bar() + theme(axis.text.x = element_text(angle=90, hjust = 1, vjust=0.5, size=rel(1.5)))+ 
+  labs(title='msleep', x='order', y='observation')+ 
+  theme(axis.title = element_text(size=18))+
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(legend.key.size = unit(2, 'mm'))
 
 ```
 
@@ -232,46 +266,40 @@ From this point onwards, you may need to iteratively resize the text of the tick
   (Copy-paste and extend the code chunk above.)
 
 ```{r}
-
-
-
-
-
-
-
-
-
+ggplot(ggplot2::msleep, aes(x=order, fill=genus)) +
+  geom_bar() + theme(axis.text.x = element_text(angle=90, hjust = 1, vjust=0.5, size=rel(1.5)))+ 
+  labs(title='msleep', x='order', y='observation')+ 
+  theme(axis.title = element_text(size=18))+
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(legend.key.size = unit(2, 'mm')) +
+  guides(fill=guide_legend(ncol=3))
 
 ```
 
 - Add a contour of thin black lines to the bars.
 
 ```{r}
-
-
-
-
-
-
-
-
-
+ggplot(ggplot2::msleep, aes(x=order)) +
+  geom_bar(aes(fill=genus),color='black',linewidth=0.5) + 
+  theme(axis.text.x = element_text(angle=90, hjust = 1, vjust=0.5, size=rel(1.5)))+ 
+  labs(title='msleep', x='order', y='observation')+ 
+  theme(axis.title = element_text(size=16))+
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(legend.key.size = unit(2, 'mm')) +
+  guides(fill=guide_legend(ncol=5))
 
 ```
 
 - Assign that last plot to an object called `obds_msleep`.
 
 ```{r}
-
-
-
-
-
-
-
-
-
-
+obds_msleep <- ggplot(ggplot2::msleep, aes(x=order, fill=genus),color='black',linewidth=0.5) +
+  geom_bar() + theme(axis.text.x = element_text(angle=90, hjust = 1, vjust=0.5, size=rel(1.5)))+ 
+  labs(title='msleep', x='order', y='observation')+ 
+  theme(axis.title = element_text(size=16))+
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(legend.key.size = unit(2, 'mm')) +
+  guides(fill=guide_legend(ncol=5))
 ```
 
 # Exercise
@@ -288,14 +316,14 @@ Using `cowplot`.
 
 ```{r, fig.height=12, fig.width=12}
 library(cowplot)
-first_row <- cowplot::plot_grid(
+first_row <- cowplot::plot_grid(obds_diamonds, obds_chickenweight
   
   
 )
-second_row <- cowplot::plot_grid(
+second_row <- cowplot::plot_grid(obds_msleep
   
 )
-super_plot <- cowplot::plot_grid(
+super_plot <- cowplot::plot_grid(first_row, second_row, nrow = 2
   
   
 )
@@ -306,6 +334,8 @@ Using `patchwork`.
 
 ```{r, fig.height=12, fig.width=12}
 library(patchwork)
+library(patchwork)
+(obds_chickenweight + obds_diamonds /obds_chickenweight)
 
 ```
 
@@ -313,9 +343,7 @@ Using `gridExtra`.
 
 ```{r, fig.height=12, fig.width=12}
 library(gridExtra)
-
-
-
+gridExtra::grid.arrange(obds_chickenweight, obds_diamonds, ncol = 2, nrow = 1)
 
 
 ```
@@ -325,7 +353,18 @@ library(gridExtra)
 You will likely need a few attempts to fine-tune the width and height of the output file.
 
 ```{r}
-ggsave(   )
+#image1
+ggsave("obds_msleep.pdf",
+ plot = obds_msleep,
+)
+####image2
+ggsave("obds_chikenweight.pdf",
+ plot = obds_chickenweight,
+)
+###image3
+ggsave("obds_diamonds.pdf",
+ plot = obds_diamonds,
+)
 ```
 
 # Exercise
