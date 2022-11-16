@@ -739,21 +739,27 @@ head(t_test_pvalues, n=10)
 
 ```{r}
 hist(t_test_pvalues)
+hist(t_test_pvalues, breaks = 50)
 ```
 
 - Correct p-values for multiple testing.
   How many genes remain before and after multiple testing?
 
 ```{r}
-result_bh <- 
+result_bh <- p.adjust(t_test_pvalues,method = "BH")
+hist(result_bh)
+table(result_bh < 0.05)
 
 ```
 
 - Use `gene_info` to get the gene name for the gene identifier with the smallest p-value.
 
 ```{r}
-gene_table <- read_excel(    )
-
+gene_table <- read_excel("GSE111543.xlsx", sheet = "gene_info")
+gene_table
+which.min(result_bh)
+row.names(logcounts_matrix)[which.min(result_bh)]
+gene_table$gene_name[gene_table$gene_id==row.names(logcounts_matrix)[which.min(result_bh)]]
 
 ```
 
