@@ -361,7 +361,7 @@ dds_filtered_updated <- estimateSizeFactors(dds_filtered_updated)
 sizeFactors(dds_filtered_updated)
 
 # Do you see any systematic differences in size factors between groups?
-dds
+#there is no significant difference
 ```
 
 # Optional: Plot size factors as barchart using ggplot
@@ -405,15 +405,31 @@ results(dds_filtered_updated)
 # So we have the actual steps that we've gone through to get to DE in one place generate the dds object again and use the DESeq() function to perform steps 1-3 in one go
 
 ```{r}
-# generate dds object 
+# generate dds object
+dds_final <-DESeqDataSetFromMatrix(
+  countData=counts_table,
+  colData=sample_info,
+  design=~replicate + cell_type,
+  tidy = FALSE,
+  ignoreRank = FALSE
+)
 
 # filter rows with 0 counts 
 
-# remove unwanted samples 
+dds_final <- dds_final[rowSums(assays(dds_final)$counts) > 0, ]
+dds_final
 
-# make DESeqDataSet (dds) object 
+
+# remove unwanted samples
+dds_final <- dds_final[,1:6]
+
 
 # run DESeq() 
+
+dds_final <- DESeq(dds_final)
+
+dim(dds_final)
+
 
 ```
 
@@ -421,7 +437,9 @@ results(dds_filtered_updated)
 
 ```{r}
 # What do the results() and summary() do, what arguments can you specify? 
-
+results_obj <- results(dds_final, alpha=0.05)
+results_obj
+summary(results_obj)
 
 ```
 
@@ -436,14 +454,31 @@ results(dds_filtered_updated)
  
 ```{r}
 # Plot normalised counts for gene ENSMUSG00000041779
-
+plotCounts(dds_final,
+  
+                    gene ="ENSMUSG00000041779",intgroup = "cell_type")
 ```
+####
+```{r}
+plotCounts(dds_final,
+           gene ="ENSMUSG00000041779",returnData = T, intgroup = "cell_type")
+```
+
 
 # Access the results table for the comparison between CD8 and CD4 T cells . Youu can also try to CD4 vs CD8 (i.e. switch the reference) - you could also try this for replicate 1 vs replicate 3 as a control 
 
 checkout `resultsNames()`  & `results()`
 
 ```{r}
+results_CD8_CD4 <- results(dds_final, alpha=0.05, contrast=c("cell_type", "CD8","CD4"))
+results_CD8_CD4
+summary(results_obj)
+summary(results_CD8_CD4)
+results_CD4_CD8 <- results(dds_final, alpha=0.05, contrast=c("cell_type", "CD4","CD8"))
+results_CD4_CD8
+summary(results_CD4_CD8)
+summary(results_CD8_CD4)
+print(summary(results_CD4_CD8),summary(results_CD8_CD4))
 
 ```
 
@@ -453,19 +488,27 @@ Table should contain log2 fold changes and p-values for all genes
 
 ```{r}
 
+results_obj %>%
+    as.data.frame() %>%
+    ggplot() +
+    geom_histogram(aes(x=pvalue), fill='lightblue') +
+    geom_histogram(aes(x=padj),fill='lightgreen')
+
 ```
 
 
 # Generate an MA plot of the log2 FC values for all genes using DESeq2 plotMA()
 
 ```{r}
-
+plotMA(results_obj, alpha=0.05)
 
 ```
 
 # Shrink the log2 FC values using the normal, apeglm and ashr methods -> see the vignette – which shall we choose? 
 
 ```{r}
+shrunkenLFC_dds_results_obj <-lfcShrink(dds_final, coef = "cell_type_CD8_vs_CD4")
+shrunkenLFC_dds_results_obj
 
 # call your results table  called shrunkenLFC_dds_results_obj
 
@@ -476,9 +519,19 @@ Table should contain log2 fold changes and p-values for all genes
 
 ```{r}
 
-# convert shrunkenLFC_dds_results_obj to a dataframe and call it shrunkenLFC_dds_results_df
+# convert shrunkenLFC_dds_results_obj to a dataframe and call it 
+
+shrunkenLFC_dds_results_df = data.frame(shrunkenLFC_dds_results_obj)
 
 # Use the org.Mm.eg.db package to get gene symbols for the ensembl gene ids (hint:you did this on bioconductor day) 
+
+head(shrunkenLFC_dds_results_df)
+
+genesymbol <- mapIds(org.Mm.eg.db,
+                  keys = rownames(shrunkenLFC_dds_results_df), column = "SYMBOL", 
+                  keytype = "ENSEMBL"  )
+
+genesymbol
 
 # How many Ensembl IDs are not assigned an gene symbol and how many gene symbols are duplicated?
 
@@ -489,6 +542,9 @@ keytypes(org.Mm.eg.db)      #to remind us of what keytypes are in this particula
 # use mapIds() to get 1:1 mapping for SYMBOL, ENTREZ and MGI
 
 # add mapId vectors to  shrunkenLFC_dds_results_df
+
+shrunkenLFC_dds_results_df$Gene_symbol <- genesymbol
+shrunkenLFC_dds_results_df
 ```
 
 
@@ -497,7 +553,7 @@ keytypes(org.Mm.eg.db)      #to remind us of what keytypes are in this particula
 ```{r}
 
 # first change covert ensembl_ids to a column 
-shrunkenLFC_dds_results_df <- results_shrunken_LFC_apeglm_filtered_df %>% 
+shrunkenLFC_dds_results_df <- shrunkenLFC_dds_results_df %>% 
 						rownames_to_column("ensembl_gene_ids")
 
 # Save results to file 
@@ -549,8 +605,6 @@ Add labels to highlight the location of some interesting genes
 # create a new column for -log10(padj)
 # create a new column to label genes with TRUE/FALSE if log2foldchange > 2 & padj < 0.05 
 #df_for_volcano_plot <- 
-
-
 
 # plot using ggplot - has fold change on x-axis and -log10(padj) on y axis 
 #volcano plot <- 
